@@ -1,0 +1,1 @@
+OPTIONS="-d -c \"ifup wan\" -l /var/run/chap-proxy.socket -p /var/run/chap-proxy.pid"

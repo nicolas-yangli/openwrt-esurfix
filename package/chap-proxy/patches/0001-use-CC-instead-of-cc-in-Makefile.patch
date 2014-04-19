@@ -1,0 +1,31 @@
+From c1154b61941ae895bb75b0dc68ad402cae381a2d Mon Sep 17 00:00:00 2001
+From: Bill Lee <bill.lee.y@gmail.com>
+Date: Sat, 19 Apr 2014 14:26:53 +0800
+Subject: [PATCH] use $(CC) instead of cc in Makefile
+
+---
+ src/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 34f9d68..5c4ba7e 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -1,7 +1,7 @@
+ objects = main.o daemon.o worker.o
+ 
+ chap-proxy: $(objects)
+-	cc $(objects) -o chap-proxy
++	$(CC) $(LDFLAGS) $^ -o $@
+ 
+ main.o: main.c daemon.h worker.h
+ daemon.o: daemon.c daemon.h
+@@ -9,4 +9,4 @@ worker.o: daemon.c worker.h
+ 
+ .PHONY: clean
+ clean:
+-	rm $(objects) chap-proxy
++	rm -f $(objects) chap-proxy
+-- 
+1.9.2
+
