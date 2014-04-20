@@ -36,9 +36,11 @@ endef
 
 define Package/chap-proxy/install
 	$(INSTALL_DIR) $(1)/etc/default
-	$(INSTALL_BIN) ./files/chap-proxy.default $(1)/etc/default/chap-proxy
+	$(INSTALL_CONF) ./files/chap-proxy.default $(1)/etc/default/chap-proxy
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/chap-proxy.init $(1)/etc/init.d/chap-proxy
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) ./files/connect_script $(1)/usr/bin/connect_script
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(CP) $(PKG_BUILD_DIR)/src/chap-proxy $(1)/usr/sbin/
 endef
