@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="OpenWRT-eSurfix : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>OpenWRT-eSurfix</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/BillLeecn/openwrt-esurfix">View on GitHub</a>
+
+          <h1 id="project_title">OpenWRT-eSurfix</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/BillLeecn/openwrt-esurfix/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/BillLeecn/openwrt-esurfix/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="%E5%A4%A9%E7%BF%BC%E6%A0%A1%E5%9B%AD%E5%AE%BD%E5%B8%A6%E8%B7%AF%E7%94%B1%E5%99%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88" class="anchor" href="#%E5%A4%A9%E7%BF%BC%E6%A0%A1%E5%9B%AD%E5%AE%BD%E5%B8%A6%E8%B7%AF%E7%94%B1%E5%99%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="octicon octicon-link"></span></a>天翼校园宽带路由器解决方案</h1>
+
+<p>天翼校园客户端 (eSurfing) 使用了修改过的 CHAP 进行身份认证。在 Windows 下，通过 
+NDIS filter 在内核空间拦截并修改 CHAP response 数据包. 在 Mac OS X 下，通过修改
+过的 pppd 进行身份认证。</p>
+
+<p>本项目通过 MITM 方式，将来自 access concentrator 的 CHAP challenge 重放给天翼客
+户端, 取得 response, 以完成身份认证。</p>
+
+<h2>
+<a name="%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C" class="anchor" href="#%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C"><span class="octicon octicon-link"></span></a>使用手册</h2>
+
+<h3>
+<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
+
+<p>为了通过路由器使用宽带，您需要：</p>
+
+<ol>
+<li>1台已安装 OpenWRT 12.09(Attitude Adjustment) 的路由器。</li>
+<li>1台已安装天翼校园客户端的计算机</li>
+<li>2根以太网电缆</li>
+</ol><p>为了完成路由器的安装过程，您需要：</p>
+
+<ol>
+<li>1台运行 Linux 并可访问互联网的计算机</li>
+<li>知道您的路由器的 CPU 体系</li>
+<li>熟悉 vim, ssh, make 的使用</li>
+</ol><h3>
+<a name="compile" class="anchor" href="#compile"><span class="octicon octicon-link"></span></a>Compile</h3>
+
+<h4>
+<a name="%E5%AE%89%E8%A3%85%E7%BC%96%E8%AF%91%E4%BE%9D%E8%B5%96" class="anchor" href="#%E5%AE%89%E8%A3%85%E7%BC%96%E8%AF%91%E4%BE%9D%E8%B5%96"><span class="octicon octicon-link"></span></a>安装编译依赖</h4>
+
+<p>参见 <a href="http://wiki.openwrt.org/doc/howto/buildroot.exigence">http://wiki.openwrt.org/doc/howto/buildroot.exigence</a></p>
+
+<h4>
+<a name="%E8%8E%B7%E5%BE%97%E6%BA%90%E4%BB%A3%E7%A0%81" class="anchor" href="#%E8%8E%B7%E5%BE%97%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="octicon octicon-link"></span></a>获得源代码</h4>
+
+<pre><code>git clone https://github.com/BillLeecn/openwrt-esurfix.git openwrt-esurfix
+cd  openwrt-esurfix
+git checkout integrate-chap-proxy
+</code></pre>
+
+<h4>
+<a name="%E8%8E%B7%E5%BE%97%E5%88%9D%E5%A7%8B%E9%85%8D%E7%BD%AE" class="anchor" href="#%E8%8E%B7%E5%BE%97%E5%88%9D%E5%A7%8B%E9%85%8D%E7%BD%AE"><span class="octicon octicon-link"></span></a>获得初始配置</h4>
+
+<p>在 <a href="http://downloads.openwrt.org/attitude_adjustment/12.09/">OpenWRT 12.09 下载页</a>
+找到您的路由器对应的 CPU 体系，访问其中的 generic/ 目录，下载 config.CPU体系_generic, 保存为 .config</p>
+
+<h4>
+<a name="%E7%BC%96%E8%AF%91" class="anchor" href="#%E7%BC%96%E8%AF%91"><span class="octicon octicon-link"></span></a>编译</h4>
+
+<pre><code>make defconfig
+make download
+make
+</code></pre>
+
+<h3>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h3>
+
+<h4>
+<a name="%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE-rp-pppoe-server" class="anchor" href="#%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE-rp-pppoe-server"><span class="octicon octicon-link"></span></a>安装并配置 rp-pppoe-server</h4>
+
+<p>在 <a href="http://downloads.openwrt.org/attitude_adjustment/12.09/">OpenWRT 12.09 下载页</a> 找到您的路由器对应的 CPU 体系，访问其中的 generic/packages/ 目录，找到并下载 rp-pppoe-server.</p>
+
+<p>将下载到的 ipk 上传到路由器</p>
+
+<pre><code>scp rp-pppoe-server_*.ipk root@192.168.1.1:/tmp
+</code></pre>
+
+<p>用 ssh 登入路由器，安装 rp-pppoe-server.</p>
+
+<pre><code>ssh root@192.168.1.1
+opkg install /tmp/rp-pppoe-server_*.ipk
+</code></pre>
+
+<p>配置 rp-pppoe-server</p>
+
+<pre><code>vim /etc/default/pppoe-server
+</code></pre>
+
+<p>将 OPTIONS="-C MyRouter -I eth2" 改成 OPTIONS="-k -C MyRouter -I 您的路由器的LAN口".</p>
+
+<p>完成后登出路由器</p>
+
+<pre><code>exit
+</code></pre>
+
+<h4>
+<a name="%E5%AE%89%E8%A3%85-chap-proxy-%E4%B8%8E%E4%BF%AE%E6%94%B9%E7%9A%84-pppd" class="anchor" href="#%E5%AE%89%E8%A3%85-chap-proxy-%E4%B8%8E%E4%BF%AE%E6%94%B9%E7%9A%84-pppd"><span class="octicon octicon-link"></span></a>安装 chap-proxy 与修改的 pppd</h4>
+
+<pre><code>scp bin/您的CPU体系/packages/ppp_*.ipk root@192.168.1.1:/tmp
+scp bin/您的CPU体系/packages/chap-proxy_*.ipk root@192.168.1.1:/tmp
+ssh root@192.168.1.1
+opkg install /tmp/ppp_*.ipk
+opkg install /tmp/chap-proxy_*.ipk
+</code></pre>
+
+<h4>
+<a name="%E9%85%8D%E7%BD%AE-chap-proxy" class="anchor" href="#%E9%85%8D%E7%BD%AE-chap-proxy"><span class="octicon octicon-link"></span></a>配置 chap-proxy</h4>
+
+<pre><code>vim /usr/bin/connect_script
+</code></pre>
+
+<p>将 username "^#01username" 修改为 username "^#01您的宽带号码", 
+ifname nic-eth0.2 修改为 ifname nic-您的WAN口.</p>
+
+<pre><code>vim /etc/config/network
+</code></pre>
+
+<p>找到 config interface 'wan' 一节，将 option proto 设置为 'static'.</p>
+
+<h4>
+<a name="%E6%9C%80%E5%90%8E%E7%9A%84%E9%85%8D%E7%BD%AE" class="anchor" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="octicon octicon-link"></span></a>最后的配置</h4>
+
+<p>关闭防火墙与 QoS</p>
+
+<pre><code>/etc/init.d/qos disable
+/etc/init.d/firewall disable
+</code></pre>
+
+<p>启用 pppoe-server 与 chap-proxy</p>
+
+<pre><code>/etc/init.d/pppoe-server enable
+/etc/init.d/chap-proxy enable
+</code></pre>
+
+<p>重启路由器</p>
+
+<pre><code>reboot
+</code></pre>
+
+<h3>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<h4>
+<a name="%E8%BF%9E%E7%BA%BF" class="anchor" href="#%E8%BF%9E%E7%BA%BF"><span class="octicon octicon-link"></span></a>连线</h4>
+
+<p>将 WAN 口连接到宽带端口，LAN 口连接到已安装天翼客户端的机器</p>
+
+<h4>
+<a name="%E8%BF%9E%E6%8E%A5" class="anchor" href="#%E8%BF%9E%E6%8E%A5"><span class="octicon octicon-link"></span></a>连接</h4>
+
+<p>通过 ssh 登入路由器，执行 logread -f 查看 log 输出。</p>
+
+<p>使用天翼客户端连接有线宽带，若连接成功，客户端会提示用户名密码错误，同时 log 将输出 IP 地址
+与 DNS 地址。</p>
+
+<p>完成后按 Ctrl+C 中断 log 输出。</p>
+
+<h4>
+<a name="%E9%85%8D%E7%BD%AE-dns" class="anchor" href="#%E9%85%8D%E7%BD%AE-dns"><span class="octicon octicon-link"></span></a>配置 DNS</h4>
+
+<p>在路由器上编辑 /tmp/resolv.conf.auto, 写入</p>
+
+<pre><code>nameserver DNS地址1
+nameserver DNS地址2
+</code></pre>
+
+<h4>
+<a name="%E9%85%8D%E7%BD%AE-nat" class="anchor" href="#%E9%85%8D%E7%BD%AE-nat"><span class="octicon octicon-link"></span></a>配置 NAT</h4>
+
+<p>在路由器上执行</p>
+
+<pre><code>iptables -t nat -I POSTROUTING -s 192.168.1.0/24 -o wan -j MASQUERADE
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">OpenWRT-eSurfix maintained by <a href="https://github.com/BillLeecn">BillLeecn</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
