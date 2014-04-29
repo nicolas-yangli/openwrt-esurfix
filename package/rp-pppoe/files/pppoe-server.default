@@ -1,1 +1,1 @@
-OPTIONS="-C MyRouter -I eth2"
+OPTIONS="-k -C MyRouter -I br-lan"
