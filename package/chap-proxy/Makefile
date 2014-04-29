@@ -12,9 +12,12 @@ PKG_NAME:=chap-proxy
 PKG_VERSION:=0.1.0
 PKG_RELEASE:=1
 
-PKG_SOURCE:=v$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/BillLeecn/chap-proxy/archive/
-PKG_MD5SUM:=0adfdf24b6ef6f03b041df71e24a537e
+PKG_SOURCE:=$(PKG_NAME).tar.gz
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=git://github.com/BillLeecn/chap-proxy.git
+PKG_SOURCE_VERSION:=576dcd7c3d410fb78b7a34d0e3e63cdf4739a076
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 

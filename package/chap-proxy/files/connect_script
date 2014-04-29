@@ -1,9 +1,3 @@
 #!/bin/sh
-exec pppd plugin rp-pppoe.so \
-    nic-eth0.2 \
-    user "^#01username" \
-    password "mock" \
-    ifname nic-eth0.2 \
-    noipdefault defaultroute noauth usepeerdns \
-    ip-up-script /lib/netifd/ppp-up \
-    ip-down-script /lib/netifd/ppp-down
+
+ifup wan
