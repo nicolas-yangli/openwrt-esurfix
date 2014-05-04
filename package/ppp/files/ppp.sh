@@ -64,13 +64,14 @@ ppp_generic_teardown() {
 	case "$ERROR" in
 		11|19)
 			proto_notify_error "$interface" AUTH_FAILED
-			json_get_var authfail authfail
-			if [ "${authfail:-0}" -gt 0 ]; then
-				proto_block_restart "$interface"
-			fi
+			proto_block_restart "$interface"
 		;;
 		2)
 			proto_notify_error "$interface" INVALID_OPTIONS
+			proto_block_restart "$interface"
+		;;
+		*)
+			proto_notify_error "$interface" GENERIC_ERROR
 			proto_block_restart "$interface"
 		;;
 	esac
