@@ -26,7 +26,6 @@ define Package/chap-proxy
   CATEGORY:=Network
   DEPENDS:=+ppp +rp-pppoe-server
   TITLE:=CHAP Proxy
-  PKGARCH:=all
 endef
 
 define Package/chap-proxy/description
