@@ -1,5 +1,5 @@
 diff --git a/pppd/chap-new.c b/pppd/chap-new.c
-index 2714bff..c1e647e 100644
+index 2714bff..ab875ae 100644
 --- a/pppd/chap-new.c
 +++ b/pppd/chap-new.c
 @@ -44,6 +44,16 @@
@@ -69,7 +69,7 @@ index 2714bff..c1e647e 100644
  	clen = *p;
  	nlen = strlen(ss->name);
  	memcpy(p + 1 + clen, ss->name, nlen);
-@@ -294,11 +331,36 @@ chap_generate_challenge(struct chap_server_state *ss)
+@@ -294,11 +331,44 @@ chap_generate_challenge(struct chap_server_state *ss)
  
  	p = ss->challenge + PPP_HDRLEN;
  	p[0] = CHAP_CHALLENGE;
@@ -89,15 +89,23 @@ index 2714bff..c1e647e 100644
 +            exit(EXIT_FAILURE);
 +
 +        notice("fetching challenge from CHAP proxy");
-+CPGC_RS:if((len = read(sockfd, buf, sizeof(buf))) < 0){
-+            switch(errno){
-+                case EINTR:
-+                    goto CPGC_RS;
-+                    break;
-+                default:
-+                    error("read: %m");
-+                    return;
++        for(;;){
++            if((len = read(sockfd, buf, sizeof(buf))) < 0){
++                switch(errno){
++                    case EINTR:
++                        continue;
++                        break;
++                    default:
++                        error("read: %m");
++                        close(sockfd);
++                        chap_proxy_sock = -1;
++                        return;
++                }
 +            }
++            break;
++        }
++        if(len == 0){
++            return;
 +        }
 +        *id = buf[0];
 +        if( buf[1] > len-2 )
@@ -107,7 +115,7 @@ index 2714bff..c1e647e 100644
  /*
   * chap_handle_response - check the response to our challenge.
   */
-@@ -411,21 +473,12 @@ chap_verify_response(char *name, char *ourname, int id,
+@@ -411,21 +481,14 @@ chap_verify_response(char *name, char *ourname, int id,
  		     unsigned char *challenge, unsigned char *response,
  		     char *message, int message_space)
  {
@@ -130,12 +138,14 @@ index 2714bff..c1e647e 100644
 +    int sockfd = chap_proxy_sock;
 +    notice("offering CHAP proxy");
 +    write(sockfd, response, response_len+1);
++    close(sockfd);
++    chap_proxy_sock = -1;
 +    snprintf(message, message_space, "Access Denied!");
 +    return 0;
  }
  
  /*
-@@ -436,11 +489,9 @@ chap_respond(struct chap_client_state *cs, int id,
+@@ -436,11 +499,9 @@ chap_respond(struct chap_client_state *cs, int id,
  	     unsigned char *pkt, int len)
  {
  	int clen, nlen;
@@ -147,7 +157,7 @@ index 2714bff..c1e647e 100644
  
  	if ((cs->flags & (LOWERUP | AUTH_STARTED)) != (LOWERUP | AUTH_STARTED))
  		return;		/* not ready */
-@@ -456,19 +507,11 @@ chap_respond(struct chap_client_state *cs, int id,
+@@ -456,19 +517,11 @@ chap_respond(struct chap_client_state *cs, int id,
  	if (explicit_remote || (remote_name[0] != 0 && rname[0] == 0))
  		strlcpy(rname, remote_name, sizeof(rname));
  
@@ -168,7 +178,7 @@ index 2714bff..c1e647e 100644
  
  	clen = *p;
  	nlen = strlen(cs->name);
-@@ -485,6 +528,60 @@ chap_respond(struct chap_client_state *cs, int id,
+@@ -485,6 +538,67 @@ chap_respond(struct chap_client_state *cs, int id,
  }
  
  static void
@@ -200,28 +210,35 @@ index 2714bff..c1e647e 100644
 +        unsigned char buf[64];
 +        unsigned char message_len;
 +
++        memset(response, 0, 64);
++
 +        notice("requesting CHAP proxy");
++        if(challenge_len > sizeof(buf)-2)
++            challenge_len = sizeof(buf)-2;
 +        buf[i++] = idbyte;
 +        buf[i++] = challenge_len;
 +        memcpy(buf+i, challenge, challenge_len);
 +        message_len = challenge_len + 2;
-+        if( message_len > sizeof(buf) )
-+            message_len = sizeof(buf);
 +        errno = 0;
 +        if(write(sockfd, buf, message_len) != message_len){
 +            error("write: %m");
 +            return;
 +        }
-+CPMR_RS:if((i = read(sockfd, buf, sizeof(buf))) < 0){
-+            switch(errno){
-+                case EINTR:
-+                    goto CPMR_RS;
-+                    break;
-+                default:
-+                    error("read: %m");
-+                    return;
++        for(;;){
++            if((i = read(sockfd, buf, sizeof(buf))) < 0){
++                switch(errno){
++                    case EINTR:
++                        continue;
++                        break;
++                    default:
++                        error("read: %m");
++                        close(sockfd);
++                        return;
++                }
 +            }
++            break;
 +        }
++        close(sockfd);
 +        memcpy(response, buf, i);
 +}
 +
