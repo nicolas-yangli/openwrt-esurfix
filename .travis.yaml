@@ -1,0 +1,10 @@
+language: c
+compiler: gcc
+
+cache:
+    directories:
+    - dl
+
+install: sudo ./.travis/install-deps.sh
+after_install: ./.travis/get-config.sh
+scripts: ./.travis/build.sh
