@@ -6,5 +6,4 @@ cache:
     - dl
 
 install: sudo ./.travis/install-deps.sh
-after_install: ./.travis/get-config.sh
-scripts: ./.travis/build.sh
+script: ./.travis/build.sh
