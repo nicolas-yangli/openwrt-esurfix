@@ -113,6 +113,7 @@ opkg install /tmp/chap-proxy_*.ipk
 <p>找到 config interface 'wan' 一节按如下方式设置：</p>
 
 <pre><code>config interface 'wan'
+    option ifname 'eth0.2'    # 注意：请保留原来的 ifname, 不要照抄这一行
     option proto 'pppoe'
     option username '^#02宽带帐号'
     option password 'stub'
